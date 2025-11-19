@@ -1,617 +1,587 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>November LDT — Emotion vs Neutral</title>
-<style>
-:root{
---bg: #fff7f0;
---panel: #fff4ea;
---burnt: #b7541e;
---cinn: #8b3a1a;
---muted: #6b4a3c;
---accent-grad: linear-gradient(90deg,#ffbe76,#c85a18);
-}
-body{
-margin:0;
-font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-background: linear-gradient(180deg,#fffaf5,#fff3e6);
-color:var(--muted);
--webkit-font-smoothing:antialiased;
--moz-osx-font-smoothing:grayscale;
-}
-.wrap{
-max-width:900px;
-margin:28px auto;
-background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,245,235,0.95));
-padding:22px;
-border-radius:12px;
-box-shadow: 0 10px 30px rgba(139,58,18,0.06);
-border:1px solid rgba(200,150,110,0.06);
-}
-h1{ margin:0; color:var(--cinn); }
-.lead { margin-top:6px; color:#7a5a49; }
-.center { text-align:center; }
-.muted { color:#7a5a49; }
-button.primary{
-background: var(--burnt);
-color:#fff;
-border:none;
-padding:10px 14px;
-border-radius:8px;
-font-size:15px;
-cursor:pointer;
-box-shadow: 0 6px 18px rgba(200,90,40,0.14);
-}
-.kbd{ display:inline-block; padding:6px 8px; border-radius:6px; background:#fff3ea; border:1px solid rgba(139,58,18,0.06); margin-left:6px; font-weight:600; }
-.panel{ background:var(--panel); padding:14px; border-radius:10px; margin-top:14px; }
-label{ display:block; margin-top:10px; color:#6b4a3c; }
-input[type="text"], input[type="number"], select{
-width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(139,58,18,0.08); margin-top:6px;
-}
-#wordDisplay{ font-size:56px; font-weight:700; color:#351f16; font-family: "Helvetica Neue", Arial, sans-serif; }
-#fix { font-size:48px; color:var(--cinn); margin-top:24px; }
-.small { font-size:13px; color:#7a5a49; }
-#progressBar{ height:10px; background:#fde6d8; border-radius:6px; overflow:hidden; margin-top:12px;}
-#progressFill{ height:100%; background: linear-gradient(90deg,#ffbe76,#c85a18); width:0%; }
-.notice { background:#fff7f0; padding:10px; border-radius:8px; border:1px solid rgba(200,150,110,0.06); margin-top:10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Task Experiment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+            color: #2C1810;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Falling leaves animation */
+        .leaf {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            opacity: 0.7;
+            animation: fall linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .container {
+            background: rgba(255, 248, 240, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            border: 3px solid #8B4513;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            color: #8B4513;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #A0522D;
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            margin: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #8B4513;
+        }
+
+        input {
+            width: 300px;
+            background: white;
+        }
+
+        button {
+            background: #D2691E;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #A0522D;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .instructions {
+            text-align: left;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+
+        .instructions ul {
+            margin-left: 30px;
+        }
+
+        #experimentArea {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #fixation {
+            font-size: 60px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        #letterDisplay {
+            font-size: 80px;
+            font-weight: bold;
+            color: #2C1810;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+        }
+
+        #emotionalWord {
+            position: absolute;
+            font-size: 48px;
+            font-weight: bold;
+            color: #DC143C;
+            opacity: 0;
+            transition: opacity 0.05s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .progress {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #A0522D;
+            font-weight: bold;
+        }
+
+        .break-screen {
+            padding: 40px;
+        }
+
+        .break-screen h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .november-decoration {
+            font-size: 50px;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-<div class="wrap" id="app">
+    <!-- Falling leaves -->
+    <div id="leaves"></div>
 
-<!-- TITLE PAGE -->
-<div id="page-title" class="center">
-    <h1>Lexical Detection Test</h1>
-    <div class="lead">A short lexical decision task testing whether emotional words are processed faster than neutral words.</div>
-    <div style="margin-top:18px;">
-    <button class="primary" id="btnStart">Get started</button>
+    <div class="container">
+        <!-- Title Page -->
+        <div id="titlePage" class="page active">
+            <div class="november-decoration">🍂 🍁 🦃 🍂 🍁</div>
+            <h1>Attention & Perception Study</h1>
+            <p style="font-size: 1.2em; margin: 30px 0;">Welcome to our research experiment</p>
+            <p style="margin: 20px 0;">This study investigates visual attention and letter detection</p>
+            <button onclick="goToPage('participantPage')">Begin</button>
+            <div class="november-decoration">🍂 🍁 🌾 🍂 🍁</div>
+        </div>
+
+        <!-- Participant Details Page -->
+        <div id="participantPage" class="page">
+            <h1>Participant Information</h1>
+            <div class="form-group">
+                <label>Participant ID:</label>
+                <input type="text" id="participantId" placeholder="Enter your ID">
+            </div>
+            <div class="form-group">
+                <label>Age:</label>
+                <input type="number" id="participantAge" placeholder="Enter your age" min="18" max="100">
+            </div>
+            <div class="form-group">
+                <label>Gender:</label>
+                <select id="participantGender" style="width: 300px; padding: 12px;">
+                    <option value="">Select...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+            <button onclick="saveParticipantData()">Continue</button>
+        </div>
+
+        <!-- Instructions Page -->
+        <div id="instructionsPage" class="page">
+            <h1>Instructions</h1>
+            <div class="instructions">
+                <p><strong>Task Overview:</strong></p>
+                <ul>
+                    <li>You will see a rapid stream of letters appearing one at a time</li>
+                    <li>Your task is to press the <strong>SPACEBAR</strong> as quickly as possible when you see the letter <strong>X</strong></li>
+                    <li>Each trial begins with a fixation cross (+) in the center</li>
+                    <li>15 letters will appear rapidly, one after another</li>
+                    <li>Some trials will contain the letter X, others will not</li>
+                    <li>Words may briefly appear during the letter stream - ignore them and focus on detecting X</li>
+                </ul>
+                <br>
+                <p><strong>Important:</strong></p>
+                <ul>
+                    <li>Respond as quickly and accurately as possible</li>
+                    <li>Only press the spacebar when you see X</li>
+                    <li>Keep your eyes on the center of the screen</li>
+                    <li>You will complete 10 practice trials first</li>
+                    <li>The experiment has 3 blocks with breaks in between</li>
+                </ul>
+            </div>
+            <button onclick="startPractice()">Start Practice Trials</button>
+        </div>
+
+        <!-- Experiment Area -->
+        <div id="experimentPage" class="page">
+            <div class="progress" id="progressText"></div>
+            <div id="experimentArea">
+                <div id="fixation"></div>
+                <div id="letterDisplay"></div>
+                <div id="emotionalWord"></div>
+            </div>
+        </div>
+
+        <!-- Break Page -->
+        <div id="breakPage" class="page">
+            <div class="break-screen">
+                <div class="november-decoration">🍂 ☕ 🍂</div>
+                <h2>Take a Break</h2>
+                <p id="breakText" style="font-size: 1.2em; margin: 20px 0;"></p>
+                <p style="margin: 20px 0;">Rest your eyes and relax for a moment.</p>
+                <button onclick="continueAfterBreak()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Thank You Page -->
+        <div id="thankYouPage" class="page">
+            <div class="november-decoration">🍂 🍁 🦃 🍂 🍁</div>
+            <h1>Thank You!</h1>
+            <p style="font-size: 1.2em; margin: 30px 0;">You have completed the experiment.</p>
+            <p style="margin: 20px 0;">Your data has been prepared for download.</p>
+            <button id="downloadBtn" onclick="downloadData()">Download Results (CSV)</button>
+            <div class="november-decoration">🍂 🍁 🌾 🍂 🍁</div>
+        </div>
     </div>
-    <!-- <div class="small" style="margin-top:12px">Designed for lab/online demo. Use the participant form on the next page.</div> -->
-</div>
 
-<!-- PARTICIPANT DETAILS PAGE -->
-<div id="page-participant" style="display:none;">
-    <h2 style="color:var(--cinn)">Participant details</h2>
-    <div class="panel">
-    <label>Participant ID (e.g., S01)</label>
-    <input id="pid" type="text" placeholder="Enter your name bro.">
+    <script>
+        // Experimental stimuli
+        const stimuli = {
+            positiveHigh: ['DELIGHTED', 'ECSTATIC', 'THRILLED', 'JOYFUL', 'ELATED', 'WONDERFUL'],
+            positiveLow: ['PLEASANT', 'NICE', 'DECENT', 'FINE', 'OKAY', 'GOOD'],
+            negativeHigh: ['TERRIBLE', 'HORRIBLE', 'DREADFUL', 'AWFUL', 'TRAGIC', 'DEVASTATING'],
+            negativeLow: ['UNPLEASANT', 'BAD', 'POOR', 'NEGATIVE', 'UNFAVORABLE', 'MEDIOCRE'],
+            neutral: ['TYPICAL', 'AVERAGE', 'ORDINARY', 'REGULAR', 'NORMAL', 'STANDARD']
+        };
 
-    <label>Age</label>
-    <input id="age" type="number" min="16" max="120" placeholder="e.g., 24">
+        const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWYZ'.split(''); // Excluding X
+        
+        let participantData = {};
+        let trials = [];
+        let currentTrial = 0;
+        let currentBlock = 0;
+        let isPractice = true;
+        let responses = [];
+        let trialStartTime = 0;
+        let targetPresent = false;
+        let responded = false;
 
-    <label>Gender (optional)</label>
-    <input id="gender" type="text" placeholder="Male / Female / Other">
-
-    <label>Native language</label>
-    <input id="lang" type="text" placeholder="English">
-
-    <label>Response mapping (choose)</label>
-    <select id="mapping">
-        <option value="F_word">F = WORD, J = NONWORD</option>
-        <option value="F_nonword">F = NONWORD, J = WORD</option>
-    </select>
-
-    <div style="margin-top:12px; text-align:right;">
-        <button class="primary" id="btnToInstr">Continue to instructions</button>
-    </div>
-    </div>
-</div>
-
-<!-- INSTRUCTIONS PAGE -->
-<div id="page-instructions" style="display:none;">
-    <h2 style="color:var(--cinn)">Instructions</h2>
-    <div class="panel">
-    <p><strong>Task:</strong> On each trial you will see a single letter string in the center of the screen. Decide whether it is a real English <strong>word</strong> or a <strong>nonword</strong> (a pronounceable made-up string).</p>
-
-    <p><strong>Response keys:</strong> <span id="keyF" class="kbd">F</span> and <span id="keyJ" class="kbd">J</span>. The mapping you chose will be shown here. Respond as quickly and accurately as possible.</p>
-
-    <p>There will be a short practice block (with feedback) followed by the main experiment (no trial-by-trial feedback). Take short breaks when prompted.</p>
-
-    <div class="notice">
-        <strong>Important:</strong> Sit at a comfortable distance from the screen. Use a desktop or laptop (not mobile). Try to avoid switching tabs during the task.
-    </div>
-
-    <div style="margin-top:12px; text-align:right;">
-        <button class="primary" id="btnStartPractice">Start practice</button>
-    </div>
-    </div>
-</div>
-
-<!-- FIXATION / TRIAL AREA -->
-<div id="trial-area" style="display:none;" class="center">
-    <div id="progressBar"><div id="progressFill"></div></div>
-    <div id="progressText" class="small" style="margin-top:8px">Trial 0 / 0</div>
-    <div id="fix" style="display:none">+</div>
-    <div id="wordDisplay" style="display:none; margin-top:26px;">WORD</div>
-    <div id="blockMessage" class="small" style="margin-top:12px; display:none;"></div>
-</div>
-
-<!-- THANK YOU / DOWNLOAD PAGE -->
-<div id="page-end" style="display:none;" class="center">
-    <h2 style="color:var(--cinn)">Thank you — experiment complete</h2>
-    <p class="small">Your data should download automatically. If download is blocked, use the button below.</p>
-    <p>Send this downloaded CSV to the experimenter, could you? 🫶</p>
-    <div id="downloadArea" style="margin-top:12px;"></div>
-</div>
-
-</div>
-
-<script>
-/* ============================
-CONFIGURATION
-============================ */
-const CONFIG = {
-maxRT: 2000,            // ms timeout
-minRT: 120,             // ms anticipatory
-fixMs: 500,             // fixation
-itiMs: 350,             // between trials
-practiceTrials: 20,     // number of practice trials
-wordsPerCell: 12,       // words per emotion cell (change as needed)
-includeNeutral: true,   // include neutral baseline
-pseudowordsPerWord: 1,  // # pseudowords per real word (equalize counts)
-breakEvery: 60          // trials before optional break
-};
-
-/* ============================
-SAMPLE STIMULUS SET (small, example)
-Replace with your chosen ANEW lists for real study.
-Each entry: {word: "...", valence: X, arousal: Y}
-valence/arousal are illustrative numeric tags for logging & later analysis.
-============================ */
-const wordLists = {
-pos_high: [
-{word:"celebrate", valence:7.6, arousal:6.5},
-{word:"victory",   valence:7.4, arousal:6.2},
-{word:"affection", valence:8.39, arousal:6.21},
-{word:"excited",   valence:7.2, arousal:6.6},
-{word:"triumph",   valence:7.1, arousal:6.1},
-{word:"fireworks", valence:7.3, arousal:6.8},
-{word:"cheer",     valence:7.0, arousal:6.0},
-{word:"love", valence:8.72, arousal:6.44},
-{word:"concert",   valence:7.1, arousal:6.0},
-{word:"festival",  valence:7.2, arousal:6.1},
-{word:"win",       valence:7.5, arousal:6.7},
-{word:"euphoria",  valence:7.6, arousal:6.9}
-],
-pos_low: [
-{word:"garden", valence:7.0, arousal:3.2},
-{word:"breeze", valence:6.8, arousal:3.1},
-{word:"serene", valence:7.2, arousal:2.9},
-{word:"cottage",valence:6.9, arousal:3.0},
-{word:"meadow", valence:6.8, arousal:3.3},
-{word:"calm",   valence:7.1, arousal:2.8},
-{word:"harbor", valence:6.9, arousal:3.1},
-{word:"sunset", valence:7.3, arousal:3.4},
-{word:"leisure",valence:6.9, arousal:3.0},
-{word:"picnic", valence:7.0, arousal:3.5},
-{word:"quiet",  valence:7.1, arousal:2.7},
-{word:"rest",   valence:6.8, arousal:2.9}
-],
-neg_high: [
-{word:"abortion", valence:2.1, arousal:5.39},
-{word:"threat",   valence:2.3, arousal:6.8},
-{word:"danger",   valence:2.0, arousal:7.0},
-{word:"alarm",    valence:2.4, arousal:6.6},
-{word:"panic",    valence:2.2, arousal:7.2},
-{word:"attack",   valence:2.1, arousal:7.0},
-{word:"rape",valence:1.25, arousal:6.81},
-{word:"terror",   valence:1.8, arousal:7.3},
-{word:"dangerous",valence:2.3, arousal:6.9},
-{word:"violence", valence:2.0, arousal:7.1},
-{word:"trauma",   valence:2.1, arousal:6.3},
-{word:"robbery",  valence:2.2, arousal:6.8}
-],
-neg_low: [
-{word:"gloom", valence:2.9, arousal:3.1},
-{word:"solemn", valence:4.3, arousal:3.56},
-{word:"lonely",valence:2.8, arousal:3.4},
-{word:"dreary",valence:3.0, arousal:2.9},
-{word:"bleak", valence:2.7, arousal:3.2},
-{word:"sadly", valence:2.6, arousal:3.0},
-{word:"mourn", valence:2.5, arousal:3.8},
-{word:"empty", valence:3.1, arousal:3.0},
-{word:"solitude",valence:3.0, arousal:3.1},
-{word:"sorrow",valence:2.5, arousal:3.5},
-{word:"lament",valence:2.8, arousal:3.2},
-{word:"blister",  valence:3.48, arousal:3.81}
-],
-neutral: [
-{word:"table", valence:5.0, arousal:3.2},
-{word:"window",valence:5.1, arousal:3.3},
-{word:"plastic",valence:4.9, arousal:3.0},
-{word:"notebook",valence:5.0, arousal:3.1},
-{word:"lamp", valence:5.2, arousal:3.0},
-{word:"brick", valence:4.8, arousal:3.4},
-{word:"pillow",valence:5.0, arousal:3.1},
-{word:"shelf", valence:5.1, arousal:3.0},
-{word:"package",valence:5.0, arousal:3.2},
-{word:"folder",valence:4.9, arousal:3.0},
-{word:"button",valence:5.0, arousal:3.1},
-{word:"corner",valence:5.1, arousal:3.0}
-]
-};
-
-/* PSEUDOWORDS (pronounceable) — same count as total words */
-const pseudowords = [
-"mibber","navon","teral","ropin","sagel","fentor","naluk","vapet","sorim","lenak",
-"grole","bilto","paren","sudok","zopen","miral","dofen","tavik","norel","kivon",
-"sapel","ridon","pavok","luren","dazel","kelen","vanop","seruk","baten","moren",
-"naxon","belto","firan","golen","poran","suden","lavok","meril","taper","ravis",
-"vopen","silon","retok","muron","davin","pelos","kuran","nenor","tolan","biren",
-"sonel","parok","furan","derin","nobex","pagol","sukar","varen","lomir","petan",
-"rufel","goner","samit","zarin","tolen","karim"
-]; // 60 pseudowords listed
-
-/* ============================
-Utilities
-============================ */
-function shuffle(a){
-for (let i=a.length-1;i>0;i--){
-const j = Math.floor(Math.random()*(i+1));
-[a[i], a[j]] = [a[j], a[i]];
-}
-}
-function sampleN(arr,n){
-const copy = arr.slice();
-shuffle(copy);
-return copy.slice(0,n);
-}
-
-/* ============================
-Build item pool: combine words & pseudowords
-============================ */
-let realItems = [];
-const cells = ["pos_high","pos_low","neg_high","neg_low"];
-cells.forEach(cell => {
-// take configured number of words (wordLists already contains that many)
-const pool = wordLists[cell].slice(0, CONFIG.wordsPerCell);
-pool.forEach(it => {
-realItems.push({
-    word: it.word,
-    isWord: true,
-    condition: cell,
-    valence: it.valence,
-    arousal: it.arousal,
-    length: it.word.length
-});
-});
-});
-if (CONFIG.includeNeutral){
-wordLists.neutral.slice(0, CONFIG.wordsPerCell).forEach(it=>{
-realItems.push({
-    word: it.word,
-    isWord: true,
-    condition: "neutral",
-    valence: it.valence,
-    arousal: it.arousal,
-    length: it.word.length
-});
-});
-}
-
-/* create pseudoword items to match number of real items */
-let totalReal = realItems.length;
-let pseudoNeeded = totalReal * CONFIG.pseudowordsPerWord;
-if (pseudowords.length < pseudoNeeded){
-// recycle with shuffle
-while (pseudowords.length < pseudoNeeded) pseudowords.push(...pseudowords);
-}
-const pseudoSample = sampleN(pseudowords, pseudoNeeded);
-let pseudoItems = pseudoSample.map(pw => ({
-word: pw,
-isWord: false,
-condition: "pseudoword",
-valence: "", arousal: "", length: pw.length
-}));
-
-/* final trial pool: real + pseudowords */
-let allItems = realItems.concat(pseudoItems);
-
-/* we will randomize and present once each (no repeated items). 
-You can change to repeat items by concatenating more copies. */
-shuffle(allItems);
-
-/* ============================
-Experiment state & UI refs
-============================ */
-let participant = {
-id: "",
-age: "",
-gender: "",
-lang: "",
-mapping: "F_word"
-};
-let trialIndex = 0;
-let results = [];
-let inPractice = false;
-let practiceList = [];
-let trialList = [];
-let responseAllowed = false;
-let trialStart = 0;
-
-const pageTitle = document.getElementById("page-title");
-const pagePart = document.getElementById("page-participant");
-const pageInstr = document.getElementById("page-instructions");
-const trialArea = document.getElementById("trial-area");
-const pageEnd = document.getElementById("page-end");
-
-const btnStart = document.getElementById("btnStart");
-const btnToInstr = document.getElementById("btnToInstr");
-const btnStartPractice = document.getElementById("btnStartPractice");
-const pidEl = document.getElementById("pid");
-const ageEl = document.getElementById("age");
-const genderEl = document.getElementById("gender");
-const langEl = document.getElementById("lang");
-const mappingEl = document.getElementById("mapping");
-const keyFspan = document.getElementById("keyF");
-const keyJspan = document.getElementById("keyJ");
-
-const progressFill = document.getElementById("progressFill");
-const progressText = document.getElementById("progressText");
-const fixEl = document.getElementById("fix");
-const wordEl = document.getElementById("wordDisplay");
-const blockMsg = document.getElementById("blockMessage");
-const downloadArea = document.getElementById("downloadArea");
-
-/* ============================
-Navigation handlers
-============================ */
-btnStart.addEventListener("click", ()=> {
-pageTitle.style.display = "none";
-pagePart.style.display = "block";
-pidEl.focus();
-});
-
-btnToInstr.addEventListener("click", ()=> {
-// read participant fields
-participant.id = (pidEl.value || `S${Math.floor(Math.random()*9999)}`).trim();
-participant.age = ageEl.value || "";
-participant.gender = genderEl.value || "";
-participant.lang = langEl.value || "";
-participant.mapping = mappingEl.value;
-// update key labels for chosen mapping
-if (participant.mapping === "F_word"){
-keyFspan.textContent = "F";
-keyJspan.textContent = "J";
-} else {
-keyFspan.textContent = "F";
-keyJspan.textContent = "J";
-}
-pagePart.style.display = "none";
-pageInstr.style.display = "block";
-});
-
-btnStartPractice.addEventListener("click", ()=> {
-// build practice list: sample a few words and nonwords
-practiceList = [];
-let practiceReal = sampleN(realItems, Math.min(12, realItems.length));
-let practicePseudo = sampleN(pseudowords, Math.min(8, pseudowords.length));
-practicePseudo = practicePseudo.map(pw => ({ word: pw, isWord:false, condition:"pseudoword", valence:"", arousal:"", length: pw.length }));
-practiceList = practiceReal.concat(practicePseudo);
-shuffle(practiceList);
-inPractice = true;
-trialIndex = 0;
-pageInstr.style.display = "none";
-startTrials(practiceList, onPracticeEnd);
-});
-
-/* ============================
-Keyboard response handler
-============================ */
-document.addEventListener("keydown", (e) => {
-if (!responseAllowed) return;
-if (e.code !== "KeyF" && e.code !== "KeyJ") return;
-
-// determine mapping: which key means "word"?
-const F_is_word = (participant.mapping === "F_word");
-const respIsWord = (e.code === "KeyF") ? F_is_word : !F_is_word;
-
-const trialArray = inPractice ? practiceList : trialList;
-const cur = trialArray[trialIndex];
-
-const rt = Math.round(performance.now() - trialStart);
-const correct = (respIsWord === Boolean(cur.isWord));
-// push result
-results.push({
-subject: participant.id,
-age: participant.age,
-gender: participant.gender,
-lang: participant.lang,
-mapping: participant.mapping,
-practice: inPractice,
-trialNumber: trialIndex+1,
-totalTrials: trialArray.length,
-word: cur.word,
-isWord: cur.isWord,
-condition: cur.condition,
-valence: cur.valence,
-arousal: cur.arousal,
-length: cur.length,
-responseKey: e.code,
-responseIsWord: respIsWord,
-correct: correct ? 1 : 0,
-rt: rt,
-timestamp: (new Date()).toISOString()
-});
-
-responseAllowed = false;
-hideStim();
-trialIndex++;
-setTimeout(()=> {
-if (trialIndex < trialArray.length){
-    showTrial(trialArray, trialIndex);
-} else {
-    // block finished
-    if (inPractice) {
-    // end practice callback
-    if (typeof onPracticeEnd === "function") onPracticeEnd();
-    } else {
-    // end main experiment
-    endExperiment();
-    }
-}
-}, 300);
-});
-
-/* ============================
-Trial flow functions
-============================ */
-function startTrials(list, onComplete){
-// set trialList if this is main experiment
-if (!inPractice){
-trialList = list;
-}
-// show trial area
-trialArea.style.display = "block";
-progressFill.style.width = "0%";
-progressText.textContent = `Trial 0 / ${list.length}`;
-blockMsg.style.display = "none";
-trialIndex = 0;
-showTrial(list, 0);
-// set onComplete
-if (!inPractice){
-endCallback = onComplete;
-} else {
-endCallback = onComplete;
-}
-}
-
-function showTrial(list, idx){
-// update progress
-progressText.textContent = `Trial ${idx+1} / ${list.length}`;
-const pct = Math.round((idx/list.length)*100);
-progressFill.style.width = `${pct}%`;
-
-// show fixation
-fixEl.style.display = "block";
-wordEl.style.display = "none";
-responseAllowed = false;
-
-setTimeout(()=> {
-// prepare stimulus
-const t = list[idx];
-// show word
-fixEl.style.display = "none";
-wordEl.textContent = t.word;
-wordEl.style.display = "block";
-
-// start timing
-trialStart = performance.now();
-responseAllowed = true;
-
-// set timeout for max RT
-const myIndex = idx;
-setTimeout(()=> {
-    if (responseAllowed && trialIndex === myIndex){
-    // timeout recording as incorrect
-    responseAllowed = false;
-    results.push({
-        subject: participant.id,
-        age: participant.age,
-        gender: participant.gender,
-        lang: participant.lang,
-        mapping: participant.mapping,
-        practice: inPractice,
-        trialNumber: idx+1,
-        totalTrials: list.length,
-        word: t.word,
-        isWord: t.isWord,
-        condition: t.condition,
-        valence: t.valence,
-        arousal: t.arousal,
-        length: t.length,
-        responseKey: "TIMEOUT",
-        responseIsWord: null,
-        correct: 0,
-        rt: CONFIG.maxRT,
-        timestamp: (new Date()).toISOString()
-    });
-    hideStim();
-    trialIndex++;
-    setTimeout(()=> {
-        if (trialIndex < list.length) showTrial(list, trialIndex);
-        else {
-        if (inPractice) {
-            if (typeof onPracticeEnd === "function") onPracticeEnd();
-        } else {
-            endExperiment();
+        // Initialize falling leaves
+        function createLeaves() {
+            const leaves = ['🍂', '🍁'];
+            const container = document.getElementById('leaves');
+            for (let i = 0; i < 15; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                leaf.style.animationDelay = Math.random() * 5 + 's';
+                leaf.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                container.appendChild(leaf);
+            }
         }
+
+        createLeaves();
+
+        // Navigation functions
+        function goToPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
         }
-    }, 300);
-    }
-}, CONFIG.maxRT + 20);
 
-}, CONFIG.fixMs);
-}
+        function saveParticipantData() {
+            const id = document.getElementById('participantId').value.trim();
+            const age = document.getElementById('participantAge').value;
+            const gender = document.getElementById('participantGender').value;
 
-function hideStim(){
-wordEl.style.display = "none";
-fixEl.style.display = "none";
-}
+            if (!id || !age || !gender) {
+                alert('Please fill in all fields');
+                return;
+            }
 
-/* ============================
-PRACTICE end -> start main
-============================ */
-function onPracticeEnd(){
-alert("Practice completed. Now the main experiment will begin. Try to be quick and accurate. Press OK to start.");
-inPractice = false;
-// build main trialList from allItems (already shuffled)
-// but ensure trials count is not too large; we present all once
-trialList = allItems.slice(); // copy
-shuffle(trialList);
-// Offer quick break message and start
-trialIndex = 0;
-startTrials(trialList, endExperiment);
-}
+            participantData = {
+                id: id,
+                age: age,
+                gender: gender,
+                date: new Date().toISOString()
+            };
 
-/* ============================
-END: compile CSV and download
-============================ */
-function endExperiment(){
-trialArea.style.display = "none";
-pageEnd.style.display = "block";
-// build CSV
-const header = ["subject","age","gender","lang","mapping","practice","trialNumber","totalTrials","word","isWord","condition","valence","arousal","length","responseKey","responseIsWord","correct","rt","timestamp"];
-let csv = header.join(",") + "\n";
-results.forEach(r => {
-const row = header.map(h => {
-    let v = r[h];
-    if (v === undefined) v = "";
-    // escape commas
-    if (typeof v === "string" && v.includes(",")) v = `"${v}"`;
-    return v;
-});
-csv += row.join(",") + "\n";
-});
+            goToPage('instructionsPage');
+        }
 
-// automatic download
-const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.href = url;
-const filename = `${participant.id || "subj"}_LDT_${(new Date()).toISOString().replace(/[:.]/g,"-")}.csv`;
-a.download = filename;
-// some browsers block auto click; attempt it, and also render a button fallback
-try {
-a.click();
-} catch (err){
-// ignore; fallback below
-}
-downloadArea.innerHTML = `<p><a href="${url}" download="${filename}" class="primary">Download data (CSV)</a></p><p class="small">If automatic download didn't start, click the button above to save your data.</p>`;
-}
+        // Generate trials
+        function generateTrials(isPracticeTrials = false) {
+            const generatedTrials = [];
+            const numTrialsPerCondition = isPracticeTrials ? 2 : 24;
+            const conditions = Object.keys(stimuli);
 
-/* ============================
-Prevent accidental text selection / focus during test
-============================ */
-document.addEventListener("selectstart", (e) => {
-if (trialArea.style.display === "block") e.preventDefault();
-});
+            conditions.forEach(condition => {
+                for (let i = 0; i < numTrialsPerCondition; i++) {
+                    const hasTarget = Math.random() < 0.7; // 70% have X
+                    const emotionalWordPosition = Math.floor(Math.random() * 12); // 0-11 so target can be after
+                    const targetPosition = hasTarget ? (emotionalWordPosition + 1 + Math.floor(Math.random() * (14 - emotionalWordPosition))) : -1; // Target always after emotional word
+                    const emotionalWord = stimuli[condition][Math.floor(Math.random() * stimuli[condition].length)];
 
-/* ============================
-End of script
-============================ */
-</script>
+                    generatedTrials.push({
+                        condition: condition,
+                        hasTarget: hasTarget,
+                        targetPosition: targetPosition,
+                        emotionalWord: emotionalWord,
+                        emotionalWordPosition: emotionalWordPosition,
+                        isPractice: isPracticeTrials
+                    });
+                }
+            });
+
+            // Shuffle trials
+            return generatedTrials.sort(() => Math.random() - 0.5);
+        }
+
+        function startPractice() {
+            isPractice = true;
+            trials = generateTrials(true);
+            currentTrial = 0;
+            goToPage('experimentPage');
+            updateProgress();
+            setTimeout(runTrial, 1000);
+        }
+
+        function startMainExperiment() {
+            isPractice = false;
+            trials = generateTrials(false);
+            currentTrial = 0;
+            currentBlock = 1;
+            goToPage('experimentPage');
+            updateProgress();
+            setTimeout(runTrial, 1000);
+        }
+
+        function updateProgress() {
+            const progressText = document.getElementById('progressText');
+            if (isPractice) {
+                progressText.textContent = `Practice Trial ${currentTrial + 1} / ${trials.length}`;
+            } else {
+                const blockTrial = (currentTrial % 40) + 1;
+                progressText.textContent = `Block ${currentBlock} / 3 - Trial ${blockTrial} / 40`;
+            }
+        }
+
+        function runTrial() {
+            if (currentTrial >= trials.length) {
+                if (isPractice) {
+                    alert('Practice complete! The main experiment will now begin.');
+                    startMainExperiment();
+                } else if (currentTrial < 120) {
+                    // Check if we need a break
+                    if (currentTrial === 40 || currentTrial === 80) {
+                        currentBlock++;
+                        showBreak();
+                    } else {
+                        continueNextTrial();
+                    }
+                } else {
+                    finishExperiment();
+                }
+                return;
+            }
+
+            const trial = trials[currentTrial];
+            responded = false;
+            targetPresent = trial.hasTarget;
+
+            // Show fixation
+            showFixation();
+
+            // After fixation, show letter stream
+            setTimeout(() => {
+                showLetterStream(trial);
+            }, 300);
+        }
+
+        function showFixation() {
+            document.getElementById('fixation').textContent = '+';
+            document.getElementById('letterDisplay').textContent = '';
+            document.getElementById('emotionalWord').style.opacity = '0';
+        }
+
+        function showLetterStream(trial) {
+            document.getElementById('fixation').textContent = '';
+            trialStartTime = performance.now();
+            let letterIndex = 0;
+
+            function showNextLetter() {
+                if (letterIndex >= 15) {
+                    document.getElementById('letterDisplay').textContent = '';
+                    document.getElementById('emotionalWord').style.opacity = '0';
+                    
+                    // Record response if no key was pressed
+                    if (!responded) {
+                        recordResponse(trial, false, null);
+                    }
+                    
+                    // Inter-trial interval (800-1200ms)
+                    const iti = 800 + Math.random() * 400;
+                    setTimeout(() => {
+                        currentTrial++;
+                        if (!isPractice && (currentTrial === 40 || currentTrial === 80)) {
+                            currentBlock++;
+                            showBreak();
+                        } else {
+                            updateProgress();
+                            runTrial();
+                        }
+                    }, iti);
+                    return;
+                }
+
+                // Check if it's time to show emotional word
+                if (letterIndex === trial.emotionalWordPosition) {
+                    // Hide letter, show only emotional word
+                    document.getElementById('letterDisplay').textContent = '';
+                    const emotionalWordEl = document.getElementById('emotionalWord');
+                    emotionalWordEl.textContent = trial.emotionalWord;
+                    emotionalWordEl.style.opacity = '1';
+                    
+                    const stimDuration = 180 + Math.random() * 20; // 180-200ms
+                    setTimeout(() => {
+                        emotionalWordEl.style.opacity = '0';
+                        letterIndex++;
+                        // Continue with next letter after word disappears
+                        setTimeout(showNextLetter, 150);
+                    }, stimDuration);
+                } else {
+                    // Show letter normally
+                    let letter;
+                    if (letterIndex === trial.targetPosition) {
+                        letter = 'X';
+                    } else {
+                        letter = allLetters[Math.floor(Math.random() * allLetters.length)];
+                    }
+                    document.getElementById('letterDisplay').textContent = letter;
+
+                    letterIndex++;
+                    // Fixed letter duration of 150ms
+                    setTimeout(showNextLetter, 150);
+                }
+            }
+
+            showNextLetter();
+        }
+
+        function recordResponse(trial, keyPressed, reactionTime) {
+            if (responded) return; // Prevent duplicate responses
+            responded = true;
+
+            const hit = trial.hasTarget && keyPressed;
+            const miss = trial.hasTarget && !keyPressed;
+            const falseAlarm = !trial.hasTarget && keyPressed;
+            const correctRejection = !trial.hasTarget && !keyPressed;
+
+            responses.push({
+                participantId: participantData.id,
+                trialNumber: currentTrial + 1,
+                block: currentBlock,
+                isPractice: trial.isPractice,
+                condition: trial.condition,
+                emotionalWord: trial.emotionalWord,
+                targetPresent: trial.hasTarget,
+                targetPosition: trial.targetPosition,
+                emotionalWordPosition: trial.emotionalWordPosition,
+                responseGiven: keyPressed,
+                reactionTime: reactionTime,
+                hit: hit,
+                miss: miss,
+                falseAlarm: falseAlarm,
+                correctRejection: correctRejection,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function showBreak() {
+            const breakText = document.getElementById('breakText');
+            breakText.textContent = `You have completed Block ${currentBlock - 1} of 3.`;
+            goToPage('breakPage');
+        }
+
+        function continueAfterBreak() {
+            goToPage('experimentPage');
+            updateProgress();
+            setTimeout(runTrial, 1000);
+        }
+
+        function continueNextTrial() {
+            updateProgress();
+            runTrial();
+        }
+
+        function finishExperiment() {
+            goToPage('thankYouPage');
+        }
+
+        function downloadData() {
+            // Create CSV
+            let csv = 'ParticipantID,Age,Gender,TrialNumber,Block,IsPractice,Condition,EmotionalWord,TargetPresent,TargetPosition,EmotionalWordPosition,ResponseGiven,ReactionTime,Hit,Miss,FalseAlarm,CorrectRejection,Timestamp\n';
+            
+            responses.forEach(r => {
+                csv += `${r.participantId},${participantData.age},${participantData.gender},${r.trialNumber},${r.block},${r.isPractice},${r.condition},${r.emotionalWord},${r.targetPresent},${r.targetPosition},${r.emotionalWordPosition},${r.responseGiven},${r.reactionTime || 'NA'},${r.hit},${r.miss},${r.falseAlarm},${r.correctRejection},${r.timestamp}\n`;
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `attention_task_${participantData.id}_${Date.now()}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Keyboard event listener
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.getElementById('experimentPage').classList.contains('active')) {
+                e.preventDefault();
+                if (!responded && trialStartTime > 0) {
+                    const rt = performance.now() - trialStartTime;
+                    recordResponse(trials[currentTrial], true, rt);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
